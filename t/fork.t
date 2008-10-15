@@ -2,6 +2,8 @@
 
 use Test::More tests => 10;
 
+my $Parent = $$;
+
 use_ok 'Test::Fork';
 
 fork_ok(2, sub{ 
@@ -9,18 +11,14 @@ fork_ok(2, sub{
     pass("child 1 again");
 });
 
+pass("parent one");
+
 fork_ok(2, sub { 
     pass("child 2");
     pass("child 2 again");
 });
 
-pass("parent");
+pass("parent two");
 
-# Give the kids a chance to finish and the reaper to run.
-sleep 1;
-sleep 1;
-sleep 1;
-
-pass("parent again");
-
-ok( Test::More->builder->use_numbers );
+1 while Test::Fork::_reaper();
+ok( Test::More->builder->use_numbers, "use_numbers back on after all children reaped" );
